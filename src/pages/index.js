@@ -1,7 +1,18 @@
 import React from "react"
-import { graphql } from "gatsby"
+import { graphql, Link } from "gatsby"
+import styled from "styled-components"
+
 import Layout from "../components/layout"
 import Seo from "../components/seo"
+
+const BlogLink = styled(Link)`
+  text-decoration: none;
+`
+
+const BlogTitle = styled.h3`
+  margin-bottom: 20px;
+  color: blue;
+`
 
 const BlogPage = ({ data }) => {
   return (
@@ -12,8 +23,11 @@ const BlogPage = ({ data }) => {
         <h4>Total Blog Posts: {data.allMarkdownRemark.totalCount}</h4>
         {data.allMarkdownRemark.edges.map(({ node }) => (
           <div key={node.id}>
-            <h2>{node.frontmatter.title}</h2>
-            <p>{node.frontmatter.date}</p>
+            <BlogLink to={node.fields.slug}>
+              <BlogTitle>
+                {node.frontmatter.title} - {node.frontmatter.date}
+              </BlogTitle>
+            </BlogLink>
             <p>{node.excerpt}</p>
           </div>
         ))}
@@ -26,16 +40,20 @@ export default BlogPage
 
 export const query = graphql`
   query {
-    allMarkdownRemark {
+    allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
       totalCount
       edges {
         node {
           id
-          excerpt
           frontmatter {
-            date
+            description
             title
+            date
           }
+          fields {
+            slug
+          }
+          excerpt
         }
       }
     }
